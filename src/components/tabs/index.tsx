@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { waterQualityData, stationData, wqiComponents, getWqiLabel } from '@/lib/data/data';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { COLORS } from '@/lib/colors/colors'
+import { COLORS } from '@/lib/colors/colors';
+
+interface WqiComponent {
+  name: string;
+  value: number;
+  color?: string;  
+}
 
 type WQIValue = number;
 type StationStatus = 'Normal' | 'Warning' | 'Critical';
@@ -28,9 +34,9 @@ const getStatusBadgeClass = (status: StationStatus): string => {
   }
 };
 
-
-
 const MainTabs = () => {
+  const typedWqiComponents = wqiComponents as WqiComponent[];
+
   return (
     <div className="space-y-4">
       <Tabs 
@@ -46,7 +52,6 @@ const MainTabs = () => {
             <TabsTrigger value="alerts">Alerts</TabsTrigger>
           </TabsList>
         </div>
-
         
         <TabsContent value="overview" className="space-y-4">
           <Card className="border border-slate-200">
@@ -243,7 +248,7 @@ const MainTabs = () => {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={wqiComponents}
+                        data={typedWqiComponents}
                         cx="50%"
                         cy="50%"
                         innerRadius={60}
@@ -253,7 +258,7 @@ const MainTabs = () => {
                         dataKey="value"
                         label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
                       >
-                        {wqiComponents.map((entry, index) => (
+                        {typedWqiComponents.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color || COLORS.primary} />
                         ))}
                       </Pie>
@@ -266,7 +271,7 @@ const MainTabs = () => {
                   <h4 className="font-medium text-slate-800">Component Sensitivity</h4>
                   <p className="text-sm text-slate-600 mb-4">How changes in each parameter impact the overall WQI score</p>
                   
-                  {wqiComponents.map(comp => (
+                  {typedWqiComponents.map(comp => (
                     <div key={comp.name} className="mb-3">
                       <div className="flex justify-between mb-1">
                         <span className="text-sm font-medium text-slate-700">{comp.name}</span>
